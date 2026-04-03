@@ -1,0 +1,18 @@
+<h2>Welcome {{name}}</h2>
+
+<a href="/profile">Profile</a>
+<a href="/pyq">PYQ</a>
+
+<h3>Videos</h3>
+{% for v in videos %}
+<video width="300" controls>
+<source src="/video/{{v.filename}}">
+</video>
+{% endfor %}
+
+<h3>PDF</h3>
+{% for p in pdfs %}
+<a href="/pdf/{{p.filename}}">{{p.title}}</a><br>
+{% endfor %}
+
+<a href="/mcq">Start Test</a>
