@@ -11,15 +11,15 @@ db = SQLAlchemy(app)
 
 # -------- DATABASE CREATE FIX --------
 
-with app.app_context():
-    db.create_all()
+
 # -------- MODELS --------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     trade = db.Column(db.String(50))
     password = db.Column(db.String(100))
-
+with app.app_context():
+    db.create_all()
 class Video(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
