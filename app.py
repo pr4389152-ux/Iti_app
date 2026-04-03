@@ -86,7 +86,14 @@ def dashboard():
     pdfs = PDF.query.filter_by(trade=session['trade']).all()
 
     return render_template('dashboard.html', videos=videos, pdfs=pdfs, name=session['user'])
-
+# admin login 
+@app.route('/admin_login', methods=['GET','POST'])
+def admin_login():
+    if request.method == 'POST':
+        if request.form['username'] == "pooja" and request.form['password'] == "admin123":
+            session['admin'] = True
+            return redirect('/admin')
+    return render_template('admin_login.html')
 # -------- LOGOUT --------
 @app.route('/logout')
 def logout():
