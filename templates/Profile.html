@@ -1,0 +1,8 @@
+<h2>Profile</h2>
+<p>Name: {{user.name}}</p>
+<p>Trade: {{user.trade}}</p>
+
+<h3>Results</h3>
+{% for r in results %}
+<p>Score: {{r.score}}</p>
+{% endfor %}
