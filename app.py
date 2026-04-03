@@ -102,7 +102,7 @@ def admin():
     @app.route('/admin_logout')
 def admin_logout():
     session.pop('admin', None)
-    return redirect('/admin_login')
+        return redirect('/admin_login')
 # -------- FILE SERVE --------
 @app.route('/video/<filename>')
 def video(filename):
