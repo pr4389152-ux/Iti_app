@@ -65,11 +65,11 @@ def login():
             ).first()
 
             if user:
-                session['user'] = user.name
-                session['trade'] = user.trade
-                return redirect('/dashboard')
+                    session['user'] = user.name
+                    session['trade'] = user.trade
+    return redirect('/dashboard')
             else:
-                return "Invalid Username or Password"
+                  return "Invalid Username or Password"
 
         except Exception as e:
             return str(e)
