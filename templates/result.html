@@ -1,0 +1,6 @@
+<h2>Score: {{score}}</h2>
+
+<h3>Wrong Answers:</h3>
+{% for w in wrong %}
+<p>{{w[0]}} → {{w[1]}}</p>
+{% endfor %}
