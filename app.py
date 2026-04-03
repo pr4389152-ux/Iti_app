@@ -65,11 +65,11 @@ def login():
             ).first()
 
             if user:
-                    session['user'] = user.name
-                    session['trade'] = user.trade
-    return redirect('/dashboard')
+                session['user'] = user.name
+                session['trade'] = user.trade
+                return redirect('/dashboard')
             else:
-                  return "Invalid Username or Password"
+                return "Invalid Username or Password"
 
         except Exception as e:
             return str(e)
@@ -86,24 +86,32 @@ def dashboard():
     pdfs = PDF.query.filter_by(trade=session['trade']).all()
 
     return render_template('dashboard.html', videos=videos, pdfs=pdfs, name=session['user'])
-#admin
+
+# -------- ADMIN LOGIN --------
 @app.route('/admin_login', methods=['GET','POST'])
 def admin_login():
     if request.method == 'POST':
         if request.form['username'] == "pooja" and request.form['password'] == "admin123":
-               session['admin'] = True
-        return redirect('/admin')
-#admin panel
+            session['admin'] = True
+            return redirect('/admin')
+        else:
+            return "Wrong Admin Login ❌"
+
+    return render_template('admin_login.html')
+
+# -------- ADMIN PANEL --------
 @app.route('/admin')
 def admin():
     if 'admin' not in session:
         return redirect('/admin_login')
     return render_template('admin.html')
-    #logout
+
+# -------- ADMIN LOGOUT --------
 @app.route('/admin_logout')
 def admin_logout():
     session.pop('admin', None)
-        return redirect('/admin_login')
+    return redirect('/admin_login')
+
 # -------- FILE SERVE --------
 @app.route('/video/<filename>')
 def video(filename):
