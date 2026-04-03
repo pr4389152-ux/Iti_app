@@ -7,7 +7,7 @@ app.config['SECRET_KEY'] = 'pooja_secret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
-# withapp.app_context(): db.create_all()
+withapp.app_context(): db.create_all()
 # -------- MODELS --------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
