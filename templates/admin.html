@@ -1,0 +1,31 @@
+<h2>Admin Panel</h2>
+
+<form method="POST" enctype="multipart/form-data">
+<input name="title" placeholder="Title">
+
+<select name="trade">
+<option>IIOT</option>
+<option>IR&DMT</option>
+<option>Plumber</option>
+</select>
+
+<select name="type">
+<option value="video">Video</option>
+<option value="pdf">PDF</option>
+</select>
+
+<input type="file" name="file">
+<button>Upload</button>
+</form>
+
+<h3>Videos</h3>
+{% for v in videos %}
+<p>{{v.title}} <a href="/delete_video/{{v.id}}">Delete</a></p>
+{% endfor %}
+
+<h3>PDF</h3>
+{% for p in pdfs %}
+<p>{{p.title}} <a href="/delete_pdf/{{p.id}}">Delete</a></p>
+{% endfor %}
+
+<a href="/add_mcq">Add MCQ</a>
