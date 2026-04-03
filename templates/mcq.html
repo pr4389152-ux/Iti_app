@@ -1,0 +1,10 @@
+<form method="POST">
+{% for q in questions %}
+<p>{{q.question}}</p>
+<input type="radio" name="{{q.id}}" value="{{q.op1}}">{{q.op1}}<br>
+<input type="radio" name="{{q.id}}" value="{{q.op2}}">{{q.op2}}<br>
+<input type="radio" name="{{q.id}}" value="{{q.op3}}">{{q.op3}}<br>
+<input type="radio" name="{{q.id}}" value="{{q.op4}}">{{q.op4}}<br>
+{% endfor %}
+<button>Submit</button>
+</form>
