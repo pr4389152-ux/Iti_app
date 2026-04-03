@@ -8,8 +8,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
 
-# ---------------- MODELS ----------------
-
+# -------- MODELS --------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -37,13 +36,25 @@ class MCQ(db.Model):
     op4 = db.Column(db.String(100))
     answer = db.Column(db.String(100))
 
-# ---------------- ROUTES ----------------
+class PYQ(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question = db.Column(db.String(200))
+    answer = db.Column(db.String(200))
+
+class Result(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100))
+    score = db.Column(db.Integer)
+
+# -------- ADMIN LOGIN --------
+ADMIN_USER = "pooja"
+ADMIN_PASS = "admin123"
 
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# ---------- REGISTER ----------
+# -------- REGISTER --------
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
@@ -57,7 +68,7 @@ def register():
         return redirect('/login')
     return render_template('register.html')
 
-# ---------- LOGIN ----------
+# -------- LOGIN --------
 @app.route('/login', methods=['GET','POST'])
 def login():
     if request.method == 'POST':
@@ -68,24 +79,67 @@ def login():
             return redirect('/dashboard')
     return render_template('login.html')
 
-# ---------- DASHBOARD ----------
+# -------- DASHBOARD --------
 @app.route('/dashboard')
 def dashboard():
     videos = Video.query.filter_by(trade=session['trade']).all()
     pdfs = PDF.query.filter_by(trade=session['trade']).all()
     return render_template('dashboard.html', videos=videos, pdfs=pdfs, name=session['user'])
 
-# ---------- VIDEO PLAY ----------
-@app.route('/video/<filename>')
-def video(filename):
-    return send_from_directory('static/videos', filename)
+# -------- PROFILE --------
+@app.route('/profile')
+def profile():
+    user = User.query.filter_by(name=session['user']).first()
+    results = Result.query.filter_by(username=session['user']).all()
+    return render_template('profile.html', user=user, results=results)
 
-# ---------- PDF VIEW ----------
-@app.route('/pdf/<filename>')
-def pdf(filename):
-    return send_from_directory('static/pdfs', filename)
+# -------- ADMIN LOGIN --------
+@app.route('/admin_login', methods=['GET','POST'])
+def admin_login():
+    if request.method == 'POST':
+        if request.form['username'] == ADMIN_USER and request.form['password'] == ADMIN_PASS:
+            session['admin'] = True
+            return redirect('/admin')
+    return render_template('admin_login.html')
 
-# ---------- MCQ ----------
+# -------- ADMIN PANEL --------
+@app.route('/admin', methods=['GET','POST'])
+def admin():
+    if 'admin' not in session:
+        return redirect('/admin_login')
+
+    if request.method == 'POST':
+        file = request.files['file']
+        file_type = request.form['type']
+
+        if file_type == 'video':
+            file.save(os.path.join('static/videos', file.filename))
+            db.session.add(Video(title=request.form['title'], filename=file.filename, trade=request.form['trade']))
+
+        elif file_type == 'pdf':
+            file.save(os.path.join('static/pdfs', file.filename))
+            db.session.add(PDF(title=request.form['title'], filename=file.filename, trade=request.form['trade']))
+
+        db.session.commit()
+
+    videos = Video.query.all()
+    pdfs = PDF.query.all()
+    return render_template('admin.html', videos=videos, pdfs=pdfs)
+
+# -------- DELETE --------
+@app.route('/delete_video/<int:id>')
+def delete_video(id):
+    db.session.delete(Video.query.get(id))
+    db.session.commit()
+    return redirect('/admin')
+
+@app.route('/delete_pdf/<int:id>')
+def delete_pdf(id):
+    db.session.delete(PDF.query.get(id))
+    db.session.commit()
+    return redirect('/admin')
+
+# -------- MCQ --------
 @app.route('/mcq', methods=['GET','POST'])
 def mcq():
     questions = MCQ.query.all()
@@ -98,20 +152,43 @@ def mcq():
                 score += 1
             else:
                 wrong.append((q.question, q.answer))
+
+        db.session.add(Result(username=session['user'], score=score))
+        db.session.commit()
+
         return render_template('result.html', score=score, wrong=wrong)
     return render_template('mcq.html', questions=questions)
 
-# ---------- ADMIN ----------
-@app.route('/admin', methods=['GET','POST'])
-def admin():
+# -------- ADD MCQ --------
+@app.route('/add_mcq', methods=['GET','POST'])
+def add_mcq():
     if request.method == 'POST':
-        file = request.files['file']
-        file.save(os.path.join('static/videos', file.filename))
-        video = Video(title=request.form['title'], filename=file.filename, trade=request.form['trade'])
-        db.session.add(video)
+        db.session.add(MCQ(
+            question=request.form['question'],
+            op1=request.form['op1'],
+            op2=request.form['op2'],
+            op3=request.form['op3'],
+            op4=request.form['op4'],
+            answer=request.form['answer']
+        ))
         db.session.commit()
-    return render_template('admin.html')
+    return render_template('add_mcq.html')
 
-# ---------------- RUN ----------------
+# -------- PYQ --------
+@app.route('/pyq')
+def pyq():
+    data = PYQ.query.all()
+    return render_template('pyq.html', questions=data)
+
+# -------- FILE SERVE --------
+@app.route('/video/<filename>')
+def video(filename):
+    return send_from_directory('static/videos', filename)
+
+@app.route('/pdf/<filename>')
+def pdf(filename):
+    return send_from_directory('static/pdfs', filename)
+
+# -------- RUN --------
 if __name__ == '__main__':
     app.run(debug=True)
