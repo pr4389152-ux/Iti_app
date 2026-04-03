@@ -91,8 +91,8 @@ def dashboard():
 def admin_login():
     if request.method == 'POST':
         if request.form['username'] == "pooja" and request.form['password'] == "admin123":
-            session['admin'] = True
-            return redirect('/admin')
+               session['admin'] = True
+        return redirect('/admin')
 #admin panel
 @app.route('/admin')
 def admin():
